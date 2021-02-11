@@ -1,0 +1,11 @@
+*.nfs*
+work/
+results*/
+plots/
+test*/
+test*
+*.csv
+*.png
+*.jpg
+*.pdf
+.nextflow*
