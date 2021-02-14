@@ -155,6 +155,7 @@ ppairs = pairs[which(pairs[,"propr"]>=opt$cutoff),]
 # read gene names
 mygenes_df = read.csv(opt$mygenes, sep="\t")
 mygenes = mygenes_df$ENSEMBL
+mygenes_df$idx = 1:nrow(mygenes_df)
 ngenes_1 = nrow(mygenes_df)  # number of genes used for the propr step
 
 
@@ -168,21 +169,17 @@ print("----get GO reference graph")
 # gene-pathway matrix
 if (opt$filter){  ## filtered by GO ontology and evidence
   K = getK2(mygenes, ont=c("BP"), evi=c("EXP", "IDA", "IPI", "IMP", "IGI", "TAS", "IC"))
-  mygenes_df$idx = 1:nrow(mygenes_df)
   mygenes_df = mygenes_df[which(mygenes_df$ENSEMBL %in% rownames(K)),]
   mygenes = mygenes_df$ENSEMBL
 }else{
   K = getK(mygenes)
 }
 
-print(dim(K))
-print(length(mygenes))
-
 # adj matrix
 A = get_adj(ppairs, mygenes, mygenes_df$idx, ngenes_1)
 
 Sys.time()
-print("----GREA using graflex  [K:", nrow(K), "x", ncol(K), "] [A:", nrow(A), "x", ncol(A), "]")
+print(paste("----GREA using graflex  [K:", nrow(K), "x", ncol(K), "] [A:", nrow(A), "x", ncol(A), "]", sep=""))
 
 # graflex
 or = graflex(A, K, p=opt$permutation)
