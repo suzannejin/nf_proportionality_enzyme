@@ -214,6 +214,7 @@ rm(M)
 # OUTPUT #
 # ====== #
 
+Sys.time()
 print("----writing output files")
 
 # create output directory
