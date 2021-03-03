@@ -79,7 +79,7 @@ Channel
   .map { item -> [ item.getParent().baseName, item ] }  // [comb, propr result file]
   .concat( ch_proprOut )
   .unique()
-  .set { ch_toGraflex }
+  .set { ch_propr }
 
 // cutoff channel 
 Channel
@@ -87,19 +87,25 @@ Channel
   .map { item -> [ item, (item*100).toInteger() ]}
   .set { ch_cutoff }
 
+// 
+Channel
+  .fromList(params.combs)
+  .join( ch_propr )   // keep ch_propr channels that are mentioned in params.combs
+  .combine( ch_cutoff )
+  .set { ch_toGraflex }
+
 
 process graflex {
 
     memory '64.GB'
 
-    tag "${cutoff}"
-    publishDir "${params.output}/graflex${filter}/${comb}", mode: 'copy', overwrite: true
+    tag "${comb}_${cutoff}"
+    publishDir "${params.outdir}/graflex${filter}/${comb}", mode: 'copy', overwrite: true
 
     input:
-      tuple val(comb), file(input) from ch_toGraflex
+      tuple val(comb), file(input), val(cutoff), val(cutoff2) from ch_toGraflex
       path(genes) from params.genes
       val(permutation) from params.graflex_permutation
-      tuple val(cutoff), val(cutoff2) from ch_cutoff
       val(filter) from params.filter
     
     output:

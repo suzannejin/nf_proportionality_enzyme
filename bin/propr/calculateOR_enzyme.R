@@ -36,7 +36,11 @@ option_list = list(
   make_option("--local",
               action="store_true",
               default=FALSE,
-              help="Load local libraries.")
+              help="Load local libraries."),
+  make_option("--test",
+              action="store_true",
+              default=FALSE,
+              help="run a small test")
 ); 
  
 opt_parser = OptionParser(option_list=option_list)
@@ -179,9 +183,16 @@ if (opt$filter){  ## filtered by GO ontology and evidence
 A = get_adj(ppairs, mygenes, mygenes_df$idx, ngenes_1)
 
 Sys.time()
-print(paste("----GREA using graflex  [K:", nrow(K), "x", ncol(K), "] [A:", nrow(A), "x", ncol(A), "]", sep=""))
-
+if (all(rownames(A) != rownames(K))){
+  msg = paste("Error: The genes in A[", nrow(A), "] are not the same in K[", nrow(K), "]", sep="")
+  stop(msg)
+}
 # graflex
+if (opt$test){
+  A = A[1:100,1:100]
+  K = K[1:100,]
+}
+print(paste("----GREA using graflex  [K:", nrow(K), "x", ncol(K), "] [A:", nrow(A), "x", ncol(A), "]", sep=""))
 or = graflex(A, K, p=opt$permutation)
 
 # add GO term description
